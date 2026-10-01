@@ -48,8 +48,8 @@ app.prepare().then(() => {
         socket.partnerRoom = room;
         partner.partnerRoom = room;
 
-        socket.emit('match_found');
-        partner.emit('match_found');
+        socket.emit('match_found', { initiator: true });
+        partner.emit('match_found', { initiator: false });
       } else {
         waitingUser = socket;
       }
@@ -64,6 +64,13 @@ app.prepare().then(() => {
     socket.on('typing', (isTyping) => {
       if (socket.partnerRoom) {
         socket.to(socket.partnerRoom).emit('partner_typing', isTyping);
+      }
+    });
+
+    // WebRTC Signaling Relay
+    socket.on('signal', (data) => {
+      if (socket.partnerRoom) {
+        socket.to(socket.partnerRoom).emit('signal', data);
       }
     });
 
